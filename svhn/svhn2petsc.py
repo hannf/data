@@ -29,13 +29,13 @@ if __name__ == "__main__":
         The ``svhn2petsc`` script converts the SVHN data set (Format 2) into two dense matrices
         written to disc in the PETSc dense matrix format.
         ...
-        
-        training data set
-        
+
         $> python
         >>> import scipy.io as sp
-        >>> sp.whosmat('svhn/train_32x32.mat')
+        >>> sp.whosmat('train_32x32.mat')
         [('X', (32, 32, 3, 73257), 'uint8'), ('y', (73257, 1), 'double')]
+        >>> sp.whosmat('test_32x32.mat')
+        [('X', (32, 32, 3, 26032), 'uint8'), ('y', (26032, 1), 'double')]
 
     """
 
@@ -54,26 +54,31 @@ if __name__ == "__main__":
 # the leftmost dimension is the leading dimension, ``y`` (73257, 1)
 
     # constants
-    input_file          = "svhn/train_32x32.mat"
-    n_train             = 73257
     n_input             = 32*32*3
     n_output            = 10
-    data_output_file    = "svhn.data.petsc"
-    label_output_file   = "svhn.label.petsc"
     
+    # file names
+    input_file          = sys.argv[1]
+    data_output_file    = input_file + ".data.petsc"
+    label_output_file   = input_file + ".label.petsc"
+
+    # traing data count, use whosmat, returns a list
+    n_data = sp.whosmat(input_file)[0][1][3]
+    print("# n_data: " + str(n_data))
+
     # read mat file
     raw_data = sp.loadmat(input_file)
     
     # image format: 32 x 32 pixels, 3 color channels
     # reshape image data to vector, 3072
-    X = raw_data["X"].reshape((n_input, n_train), order = "F")
+    X = raw_data["X"].reshape((n_input, n_data), order = "F")
     
     # transpose, columns will be input vectors
     data_output = X.T.astype(">f8")
 
     # write petsc data file
     f = open(data_output_file, 'wb')
-    np.array([1211216, n_input, n_train, -1], dtype = ">i4").tofile(f)
+    np.array([1211216, n_input, n_data, -1], dtype = ">i4").tofile(f)
     data_output.tofile(f)
     f.close()
 
@@ -85,13 +90,13 @@ if __name__ == "__main__":
     # encode as zero vector with a one at label index
     # the labels are 1,...,9 and 10, first nine are clear, encode 10 as 0
     # compute index modulo n_output
-    label_output = np.zeros((n_output, n_train), dtype = ">f8")
-    for idx in range(n_train):
+    label_output = np.zeros((n_output, n_data), dtype = ">f8")
+    for idx in range(n_data):
         label_output[y[idx] % n_output, idx] = 1.0
 
     # write petsc label file
     f = open(label_output_file, 'wb')
-    np.array([1211216, n_output, n_train, -1], dtype = ">i4").tofile(f)
+    np.array([1211216, n_output, n_data, -1], dtype = ">i4").tofile(f)
     label_output.tofile(f)
     f.close()
 
