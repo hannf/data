@@ -38,6 +38,7 @@ if __name__ == "__main__":
         [('X', (32, 32, 3, 73257), 'uint8'), ('y', (73257, 1), 'double')]
 
     """
+
 #        Convert SVHN data set to PETSc dense matrix. Create two matrices:
 #            1. Data matrix. Every **column** is an input vector.
 #            2. Label matrix. Every **column** is an output vector.
@@ -64,7 +65,7 @@ if __name__ == "__main__":
     raw_data = sp.loadmat(input_file)
     
     # image format: 32 x 32 pixels, 3 color channels
-    # reshape image data to vector
+    # reshape image data to vector, 3072
     X = raw_data["X"].reshape((n_input, n_train), order = "F")
     
     # transpose, columns will be input vectors
