@@ -30,6 +30,10 @@ if __name__ == "__main__":
         written to disc in the PETSc dense matrix format.
         ...
 
+        SVHN data set (Format 2):
+
+        PETSc dense matrix format:
+
         $> python
         >>> import scipy.io as sp
         >>> sp.whosmat('train_32x32.mat')
@@ -71,12 +75,11 @@ if __name__ == "__main__":
     
     # image format: 32 x 32 pixels, 3 color channels
     # reshape image data to vector, 3072
-    X = raw_data["X"].reshape((n_input, n_data), order = "F")
-    
-    # transpose, columns will be input vectors
-    data_output = X.T.astype(">f8")
+    # convert to doubles
+    data_output = raw_data["X"].reshape((n_input, n_data), order = "F").astype(">f8")
 
     # write petsc data file
+    # !!! data is transposed !!!, data_output is F order, tofile always writes C order
     f = open(data_output_file, 'wb')
     np.array([1211216, n_input, n_data, -1], dtype = ">i4").tofile(f)
     data_output.tofile(f)
@@ -95,6 +98,7 @@ if __name__ == "__main__":
         label_output[y[idx] % n_output, idx] = 1.0
 
     # write petsc label file
+    # !!! data is transposed !!!, label_output is F order, tofile always writes C order
     f = open(label_output_file, 'wb')
     np.array([1211216, n_output, n_data, -1], dtype = ">i4").tofile(f)
     label_output.tofile(f)
