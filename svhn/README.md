@@ -67,19 +67,18 @@ wget http://ufldl.stanford.edu/housenumbers/test_32x32.mat
 ./svhn2petsc.py test_32x32.mat
 # n_data: 26032
 
-jpicau@m-053:svhn> tree
+tree -hs
 .
-├── README.md
-├── svhn2petsc.py
-├── test_32x32.mat
-├── test_32x32.mat.in.petsc
-├── test_32x32.mat.out.petsc
-├── train_32x32.mat
-├── train_32x32.mat.in.petsc
-└── train_32x32.mat.out.petsc
+├── [1.9K]  README.md
+├── [2.7K]  svhn2petsc.py
+├── [ 61M]  test_32x32.mat
+├── [610M]  test_32x32.mat.in.petsc
+├── [2.0M]  test_32x32.mat.out.petsc
+├── [174M]  train_32x32.mat
+├── [1.7G]  train_32x32.mat.in.petsc
+└── [5.6M]  train_32x32.mat.out.petsc
 
 0 directories, 8 files
-
 ```
 
 

@@ -18,6 +18,7 @@
 #
 
 import sys
+import re
 import glob
 import numpy as np
 
@@ -71,17 +72,17 @@ if __name__ == "__main__":
         # read train data set
         raw_train = []
         for _ in range(n_train):
-            raw_train.append(f.readline().rstrip().split(" "))
+            raw_train.append(re.split("\s+", f.readline().strip()))
 
         # read validate data set
         raw_valid = []
         for _ in range(n_valid):
-            raw_valid.append(f.readline().rstrip().split(" "))
+            raw_valid.append(re.split("\s+", f.readline().strip()))
         
         # read test data set
         raw_test = []
         for _ in range(n_test):
-            raw_test.append(f.readline().rstrip().split(" "))
+            raw_test.append(re.split("\s+", f.readline().strip()))
         
         # close file
         f.close()
