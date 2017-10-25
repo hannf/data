@@ -5,6 +5,23 @@
 28 x 28 pixels,
 column major, transpose for reading,
 
+input and output in separate files,
+
+**Train data set:**
+
+```
+train-images-idx3-ubyte
+train-labels-idx1-ubyte
+```
+
+
+**Test data set:**
+
+```
+t10k-images-idx3-ubyte
+t10k-labels-idx1-ubyte
+```
+
 ```
 The ``mnist2petsc`` script converts the MNIST data set into two dense matrices
 written to disc in the PETSc dense matrix format.
@@ -68,13 +85,13 @@ jpicau@m-053:mnist> tree
 ├── README.md
 ├── mnist2petsc.py
 ├── t10k-images-idx3-ubyte
-├── t10k-images-idx3-ubyte.petsc
+├── t10k-images-idx3-ubyte.in.petsc
 ├── t10k-labels-idx1-ubyte
-├── t10k-labels-idx1-ubyte.petsc
+├── t10k-labels-idx1-ubyte.out.petsc
 ├── train-images-idx3-ubyte
-├── train-images-idx3-ubyte.petsc
+├── train-images-idx3-ubyte.in.petsc
 ├── train-labels-idx1-ubyte
-└── train-labels-idx1-ubyte.petsc
+└── train-labels-idx1-ubyte.out.petsc
 
 0 directories, 10 files
 

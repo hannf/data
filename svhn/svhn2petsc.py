@@ -36,8 +36,8 @@ if __name__ == "__main__":
     
     # file names
     input_file          = sys.argv[1]                   # [mat-input-file]
-    data_output_file    = input_file + ".data.petsc"
-    label_output_file   = input_file + ".label.petsc"
+    data_output_file    = input_file + ".in.petsc"
+    label_output_file   = input_file + ".out.petsc"
 
     # traing data count, use whosmat, returns a list
     n_data = sp.whosmat(input_file)[0][1][3]

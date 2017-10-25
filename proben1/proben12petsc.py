@@ -18,8 +18,8 @@
 #
 
 import sys
+import glob
 import numpy as np
-import scipy.io as sp
 
 # ----------------------------------------------------------------------------------------
 if __name__ == "__main__":
@@ -32,98 +32,103 @@ if __name__ == "__main__":
         
         """
 
-#    # constants
-#    input_file          = "svhn/train_32x32.mat"
-#    n_train             = 73257
-#    n_input             = 32*32*3
-#    n_output            = 10
-#    data_output_file    = "svhn.data.petsc"
-#    label_output_file   = "svhn.label.petsc"
+    # header, exmaple:
+    #    bool_in=0
+    #    real_in=14
+    #    bool_out=0
+    #    real_out=3
+    #    training_examples=2104
+    #    validation_examples=1052
+    #    test_examples=1052
 
-#    # read mat file
-#    raw_data = sp.loadmat(input_file)
-#
-#    # image format: 32 x 32 pixels, 3 color channels
-#    # reshape image data to vector
-#    X = raw_data["X"].reshape((n_input, n_train), order = "F")
-#
-#    # transpose, columns will be input vectors
-#    data_output = X.T.astype(">f8")
-#
-#    # write petsc data file
-#    f = open(data_output_file, 'wb')
-#    np.array([1211216, n_input, n_train, -1], dtype = ">i4").tofile(f)
-#    data_output.tofile(f)
-#    f.close()
-#
-#    # extract labels as integer
-#    # squeeze single dimension
-#    y = np.squeeze(raw_data["y"]).astype(">i4")
-#
-#    # vectorize labels
-#    # encode as zero vector with a one at label index
-#    # the labels are 1,...,9 and 10, first nine are clear, encode 10 as 0
-#    # compute index modulo n_output
-#    label_output = np.zeros((n_output, n_train), dtype = ">f8")
-#    for idx in range(n_train):
-#        label_output[y[idx] % n_output, idx] = 1.0
-#
-#    # write petsc label file
-#    f = open(label_output_file, 'wb')
-#    np.array([1211216, n_output, n_train, -1], dtype = ">i4").tofile(f)
-#    label_output.tofile(f)
-#    f.close()
-#
-#import sys
-#import numpy as np
-#
-## ----------------------------------------------------------------------------------------
-#def read_data_from_input(header_byte_count, data_byte_count, data_count, input_file):
-#    """
-#        read_data_from_input
-#    """
-#    # open file
-#    f = open(input_file, 'rb')
-#    # read (and omit header)
-#    # read raw data
-#    header = np.fromfile(f, dtype = 'u1', count = header_byte_count)
-#    raw_data = np.fromfile(f, dtype = 'u1', count = data_byte_count * data_count)
-#    f.close()
-#    return raw_data
-#
-## ----------------------------------------------------------------------------------------
-#def write_data_to_output(data_byte_count, data_count, raw_data, output_file):
-#    """
-#        write_data_to_output
-#    """
-#    # open file
-#    f = open(output_file, 'wb')
-#    # create and write header
-#    header = np.array([1211216, data_byte_count, data_count, -1], dtype = ">i4")
-#    header.tofile(f)
-#    # write raw data as big-endian double precision
-#    raw_data.astype('>f8').tofile(f)
-#    f.close()
-#
-## ----------------------------------------------------------------------------------------
-#if __name__ == "__main__":
-#    """
-#        mnist2petsc
-#    """
-#    # no arguments?
-#    if len(sys.argv) <= 5:
-#        # print usage and exit with code 1
-#        print("usage: %s [header-byte-count] [data-byte-count] [data-count] [input-file] [output-file]" % sys.argv[0])
-#        sys.exit(1)
-#    # read in command line arguments
-#    header_byte_count = int(sys.argv[1])
-#    data_byte_count = int(sys.argv[2])
-#    data_count = int(sys.argv[3])
-#    input_file = sys.argv[4]
-#    output_file = sys.argv[5]
-#    # read inuput data
-#    # write data as petsc dense matrix
-#    raw_data = read_data_from_input(header_byte_count, data_byte_count, data_count, input_file)
-#    write_data_to_output(data_byte_count, data_count, raw_data, output_file)
+    # constants
+    n_header = 7
+
+    # paths and files
+    data_set_path = sys.argv[1]
+    data_set_file_path = glob.glob(data_set_path + "*.dt")
+
+    # process each file
+    for file_path in data_set_file_path:
+        
+        # open file
+        f = open(file_path, 'r')
+        
+        # read counts
+        count_list = []
+        for _ in range(n_header):
+            count_list.append(int(f.readline().rstrip().split("=")[1]))
+        
+        # assign counts
+        # do not distinguish between bools and reals
+        n_input = max(count_list[0:2])
+        n_output = max(count_list[2:4])
+        n_train = count_list[4]
+        n_valid = count_list[5]
+        n_test = count_list[6]
+        print("# " + file_path + ", " + str(count_list))
+        
+        # read train data set
+        raw_train = []
+        for _ in range(n_train):
+            raw_train.append(f.readline().rstrip().split(" "))
+
+        # read validate data set
+        raw_valid = []
+        for _ in range(n_valid):
+            raw_valid.append(f.readline().rstrip().split(" "))
+        
+        # read test data set
+        raw_test = []
+        for _ in range(n_test):
+            raw_test.append(f.readline().rstrip().split(" "))
+        
+        # close file
+        f.close()
+
+        #
+        # use train and test only
+        #
+        
+        # train
+        # separate in and out
+        raw_train = np.array(raw_train, ">f8")
+        raw_train_in = raw_train[:, 0:n_input]
+        raw_train_out = raw_train[:, n_input:]
+        # file paths
+        train_file_in = file_path + ".train.in.petsc"
+        train_file_out = file_path + ".train.out.petsc"
+        # write petsc file, transpose before
+        # in
+        f = open(train_file_in, 'wb')
+        np.array([1211216, n_input, n_train, -1], dtype = ">i4").tofile(f)
+        raw_train_in.T.tofile(f)
+        f.close()
+        # out
+        f = open(train_file_out, 'wb')
+        np.array([1211216, n_output, n_train, -1], dtype = ">i4").tofile(f)
+        raw_train_out.T.tofile(f)
+        f.close()
+
+        # test
+        # separate in and out
+        raw_test = np.array(raw_test, ">f8")
+        raw_test_in = raw_test[:, 0:n_input]
+        raw_test_out = raw_test[:, n_input:]
+        # file paths
+        test_file_in = file_path + ".test.in.petsc"
+        test_file_out = file_path + ".test.out.petsc"
+        # write petsc file, transpose before
+        # in
+        f = open(test_file_in, 'wb')
+        np.array([1211216, n_input, n_test, -1], dtype = ">i4").tofile(f)
+        raw_test_in.T.tofile(f)
+        f.close()
+        # out
+        f = open(test_file_out, 'wb')
+        np.array([1211216, n_output, n_test, -1], dtype = ">i4").tofile(f)
+        raw_test_out.T.tofile(f)
+        f.close()
+
 
 

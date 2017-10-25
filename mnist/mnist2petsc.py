@@ -36,8 +36,8 @@ if __name__ == "__main__":
     # file names
     data_input_file     = sys.argv[1]                   # [data-input-file]
     label_input_file    = sys.argv[2]                   # [label-input-file]
-    data_output_file    = data_input_file + ".petsc"
-    label_output_file   = label_input_file + ".petsc"
+    data_output_file    = data_input_file + ".in.petsc"
+    label_output_file   = label_input_file + ".out.petsc"
 
     # file formats
     # data
