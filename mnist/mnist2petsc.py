@@ -19,59 +19,87 @@
 
 import sys
 import numpy as np
-import scipy.io as sp
 
 # ----------------------------------------------------------------------------------------
 if __name__ == "__main__":
     """
         mnist2petsc
         
-        The ``mnist2petsc`` script converts the MNIST data set into two dense matrices
-        written to disc in the PETSc dense matrix format.
-        ...
+        usage: $> ./mnist2petsc.py [data-input-file] [label-input-file]
         
-        """
+    """
 
-#    # constants
-#    input_file          = "svhn/train_32x32.mat"
-#    n_train             = 73257
-#    n_input             = 32*32*3
-#    n_output            = 10
-#    data_output_file    = "svhn.data.petsc"
-#    label_output_file   = "svhn.label.petsc"
-#
-#    # read mat file
-#    raw_data = sp.loadmat(input_file)
-#
-#    # image format: 32 x 32 pixels, 3 color channels
-#    # reshape image data to vector
-#    X = raw_data["X"].reshape((n_input, n_train), order = "F")
-#
-#    # transpose, columns will be input vectors
-#    data_output = X.T.astype(">f8")
-#
-#    # write petsc data file
-#    f = open(data_output_file, 'wb')
-#    np.array([1211216, n_input, n_train, -1], dtype = ">i4").tofile(f)
-#    data_output.tofile(f)
-#    f.close()
-#
-#    # extract labels as integer
-#    # squeeze single dimension
-#    y = np.squeeze(raw_data["y"]).astype(">i4")
-#
-#    # vectorize labels
-#    # encode as zero vector with a one at label index
-#    # the labels are 1,...,9 and 10, first nine are clear, encode 10 as 0
-#    # compute index modulo n_output
-#    label_output = np.zeros((n_output, n_train), dtype = ">f8")
-#    for idx in range(n_train):
-#        label_output[y[idx] % n_output, idx] = 1.0
-#
-#    # write petsc label file
-#    f = open(label_output_file, 'wb')
-#    np.array([1211216, n_output, n_train, -1], dtype = ">i4").tofile(f)
-#    label_output.tofile(f)
-#    f.close()
+    # constants
+    n_input     = 28*28
+    n_output    = 10
+
+    # file names
+    data_input_file     = sys.argv[1]                   # [data-input-file]
+    label_input_file    = sys.argv[2]                   # [label-input-file]
+    data_output_file    = data_input_file + ".petsc"
+    label_output_file   = label_input_file + ".petsc"
+
+    # file formats
+    # data
+    #    [offset] [type]          [value]          [description]
+    #    0000     32 bit integer  0x00000803(2051) magic number
+    #    0004     32 bit integer  n_data           number of images
+    #    0008     32 bit integer  28               number of rows
+    #    0012     32 bit integer  28               number of columns
+    #    0016     unsigned byte   ...
+    #
+    # labels
+    #    [offset] [type]          [value]          [description]
+    #    0000     32 bit integer  0x00000801(2049) magic number (MSB first)
+    #    0004     32 bit integer  n_label          number of items
+    #    0008     unsigned byte   ...
+
+    # read data count
+    f_data_in = open(data_input_file, 'rb')
+    mno, n_data, nrow, ncol = np.fromfile(f_data_in, dtype = ">i4", count = 4)
+    print("# n_data: " + str(n_data))
+
+    # read label count
+    f_label_in = open(label_input_file, 'rb')
+    mno, n_label = np.fromfile(f_label_in, dtype = ">i4", count = 2)
+    print("# n_label: " + str(n_label))
+
+    # check counts
+    if not n_data == n_label:
+        print("### ERROR ### Count missmatch. n_data: " + str(n_data) + " n_label: " + str(n_label))
+        sys.exit(1)
+
+    # read data
+    raw_data = np.fromfile(f_data_in, dtype = 'u1', count = n_input * n_data)
+
+    # reorganize data, C order
+    data_output = np.reshape(raw_data, (n_data, n_input)).T.astype(">f8")
+
+    # write petsc data file
+    f = open(data_output_file, 'wb')
+    np.array([1211216, n_input, n_data, -1], dtype = ">i4").tofile(f)
+    data_output.tofile(f)
+    f.close()
+
+    # read labels
+    raw_label = np.fromfile(f_label_in, dtype = 'u1', count = n_label)
+
+    # vectorize labels, label values are already from 0 to 9
+    # C order, n_data leading
+    label_output = np.zeros((n_output, n_data), dtype = ">f8")
+    for idx in range(n_data):
+        label_output[raw_label[idx], idx] = 1.0
+
+    # write petsc label file
+    f = open(label_output_file, 'wb')
+    np.array([1211216, n_output, n_data, -1], dtype = ">i4").tofile(f)
+    label_output.tofile(f)
+    f.close()
+
+    # close input files
+    f_data_in.close()
+    f_label_in.close()
+
+
 
 

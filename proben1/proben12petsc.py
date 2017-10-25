@@ -39,7 +39,7 @@ if __name__ == "__main__":
 #    n_output            = 10
 #    data_output_file    = "svhn.data.petsc"
 #    label_output_file   = "svhn.label.petsc"
-#
+
 #    # read mat file
 #    raw_data = sp.loadmat(input_file)
 #
