@@ -21,6 +21,20 @@ import sys
 import numpy as np
 import scipy.io as sp
 
+#
+#   write vectors
+#
+def write_vectors(nrow, ncol, filepath, data):
+    print("writing vectors ... %s" % filepath)
+#    mat_data = np.asarray(data, dtype = ">f8", order = "C")
+#    mat_data = np.asarray(data, dtype = ">f8")
+    f = open(filepath, 'wb')
+    for i in range(ncol):
+        np.array([1211214, nrow], dtype = ">i4").tofile(f)
+#        mat_data[:,i].tofile(f)
+        data[:,i].tofile(f)
+    f.close()
+
 # ----------------------------------------------------------------------------------------
 if __name__ == "__main__":
     """
@@ -53,10 +67,11 @@ if __name__ == "__main__":
 
     # write petsc data file
     # !!! data is transposed !!!, data_output is F order, tofile always writes C order
-    f = open(data_output_file, 'wb')
-    np.array([1211216, n_input, n_data, -1], dtype = ">i4").tofile(f)
-    data_output.tofile(f)
-    f.close()
+    write_vectors(n_input, n_data, data_output_file, data_output)
+#    f = open(data_output_file, 'wb')
+#    np.array([1211216, n_input, n_data, -1], dtype = ">i4").tofile(f)
+#    data_output.tofile(f)
+#    f.close()
 
     # extract labels as integer
     # squeeze single dimension
@@ -72,9 +87,10 @@ if __name__ == "__main__":
 
     # write petsc label file
     # !!! data is transposed !!!, label_output is F order, tofile always writes C order
-    f = open(label_output_file, 'wb')
-    np.array([1211216, n_output, n_data, -1], dtype = ">i4").tofile(f)
-    label_output.tofile(f)
-    f.close()
+    write_vectors(n_output, n_data, label_output_file, label_output)
+#    f = open(label_output_file, 'wb')
+#    np.array([1211216, n_output, n_data, -1], dtype = ">i4").tofile(f)
+#    label_output.tofile(f)
+#    f.close()
 
 

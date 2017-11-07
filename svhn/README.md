@@ -61,11 +61,8 @@ $>
 wget http://ufldl.stanford.edu/housenumbers/train_32x32.mat
 wget http://ufldl.stanford.edu/housenumbers/test_32x32.mat
 
-./svhn2petsc.py train_32x32.mat
-# n_data: 73257
-
-./svhn2petsc.py test_32x32.mat
-# n_data: 26032
+time ./svhn2petsc.py train_32x32.mat
+time ./svhn2petsc.py test_32x32.mat
 
 tree -hs
 .

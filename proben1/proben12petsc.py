@@ -22,6 +22,18 @@ import re
 import glob
 import numpy as np
 
+#
+#   write vectors
+#
+def write_vectors(nrow, ncol, filepath, data):
+    print("writing vectors ... %s" % filepath)
+    mat_data = np.asarray(data, dtype = ">f8")
+    f = open(filepath, 'wb')
+    for i in range(ncol):
+        np.array([1211214, nrow], dtype = ">i4").tofile(f)
+        mat_data[i,:].tofile(f)
+    f.close()
+
 # ----------------------------------------------------------------------------------------
 if __name__ == "__main__":
     """
@@ -101,15 +113,17 @@ if __name__ == "__main__":
         train_file_out = file_path + ".train.out.petsc"
         # write petsc file, transpose before
         # in
-        f = open(train_file_in, 'wb')
-        np.array([1211216, n_input, n_train, -1], dtype = ">i4").tofile(f)
-        raw_train_in.T.tofile(f)
-        f.close()
+        write_vectors(n_input, n_train, train_file_in, raw_train_in)
+#        f = open(train_file_in, 'wb')
+#        np.array([1211216, n_input, n_train, -1], dtype = ">i4").tofile(f)
+#        raw_train_in.T.tofile(f)
+#        f.close()
         # out
-        f = open(train_file_out, 'wb')
-        np.array([1211216, n_output, n_train, -1], dtype = ">i4").tofile(f)
-        raw_train_out.T.tofile(f)
-        f.close()
+        write_vectors(n_output, n_train, train_file_out, raw_train_out)
+#        f = open(train_file_out, 'wb')
+#        np.array([1211216, n_output, n_train, -1], dtype = ">i4").tofile(f)
+#        raw_train_out.T.tofile(f)
+#        f.close()
 
         # test
         # separate in and out
@@ -121,15 +135,17 @@ if __name__ == "__main__":
         test_file_out = file_path + ".test.out.petsc"
         # write petsc file, transpose before
         # in
-        f = open(test_file_in, 'wb')
-        np.array([1211216, n_input, n_test, -1], dtype = ">i4").tofile(f)
-        raw_test_in.T.tofile(f)
-        f.close()
+        write_vectors(n_input, n_test, test_file_in, raw_test_in)
+#        f = open(test_file_in, 'wb')
+#        np.array([1211216, n_input, n_test, -1], dtype = ">i4").tofile(f)
+#        raw_test_in.T.tofile(f)
+#        f.close()
         # out
-        f = open(test_file_out, 'wb')
-        np.array([1211216, n_output, n_test, -1], dtype = ">i4").tofile(f)
-        raw_test_out.T.tofile(f)
-        f.close()
+        write_vectors(n_output, n_test, test_file_out, raw_test_out)
+#        f = open(test_file_out, 'wb')
+#        np.array([1211216, n_output, n_test, -1], dtype = ">i4").tofile(f)
+#        raw_test_out.T.tofile(f)
+#        f.close()
 
 
 

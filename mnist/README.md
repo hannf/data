@@ -4,6 +4,13 @@
 60'000 images, black/white, unsigned 8 bit int, 1 byte,
 28 x 28 pixels,
 column major, transpose for reading,
+label values: 0,...,9
+# constants
+
+```
+n_input     = 28*28 # = 784
+n_output    = 10
+```
 
 input and output in separate files,
 

@@ -30,7 +30,7 @@ if __name__ == "__main__":
     """
 
     # constants
-    n_input     = 28*28
+    n_input     = 28*28 # = 784
     n_output    = 10
 
     # file names
@@ -73,28 +73,44 @@ if __name__ == "__main__":
     raw_data = np.fromfile(f_data_in, dtype = 'u1', count = n_input * n_data)
 
     # reorganize data, C order
-    data_output = np.reshape(raw_data, (n_data, n_input)).T.astype(">f8")
+#    data_output = np.reshape(raw_data, (n_data, n_input)).T.astype(">f8")
+    data_output = np.reshape(raw_data, (n_data, n_input)).astype(">f8")
 
-    # write petsc data file
+    # write data to petsc vec file
     f = open(data_output_file, 'wb')
-    np.array([1211216, n_input, n_data, -1], dtype = ">i4").tofile(f)
-    data_output.tofile(f)
+    for i in range(n_data):
+        np.array([1211214, n_input], dtype = ">i4").tofile(f)
+        data_output[i,:].tofile(f)
     f.close()
+
+#    f = open(data_output_file, 'wb')
+#    np.array([1211216, n_input, n_data, -1], dtype = ">i4").tofile(f)
+#    data_output.tofile(f)
+#    f.close()
 
     # read labels
     raw_label = np.fromfile(f_label_in, dtype = 'u1', count = n_label)
 
     # vectorize labels, label values are already from 0 to 9
-    # C order, n_data leading
-    label_output = np.zeros((n_output, n_data), dtype = ">f8")
+    # C order, n_output leading
+# C order, n_data leading
+#    label_output = np.zeros((n_output, n_data), dtype = ">f8")
+    label_output = np.zeros((n_data, n_output), dtype = ">f8")
     for idx in range(n_data):
-        label_output[raw_label[idx], idx] = 1.0
+#        label_output[raw_label[idx], idx] = 1.0
+        label_output[idx, raw_label[idx]] = 1.0
 
     # write petsc label file
     f = open(label_output_file, 'wb')
-    np.array([1211216, n_output, n_data, -1], dtype = ">i4").tofile(f)
-    label_output.tofile(f)
+    for i in range(n_data):
+        np.array([1211214, n_output], dtype = ">i4").tofile(f)
+        label_output[i,:].tofile(f)
     f.close()
+
+#    f = open(label_output_file, 'wb')
+#    np.array([1211216, n_output, n_data, -1], dtype = ">i4").tofile(f)
+#    label_output.tofile(f)
+#    f.close()
 
     # close input files
     f_data_in.close()
