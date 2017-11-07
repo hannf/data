@@ -39,7 +39,8 @@ def read_csv_data(nfeature, nclass, csv_file):
 #        print(line)
         # strip new line at the end
         # split by separator
-        data_row = line.rstrip().split(";")
+#        data_row = line.rstrip().split(";")
+        data_row = line.rstrip().split(",")
         # check if numeric
         try:
             line_array = np.asarray(data_row, dtype = ">f8")
